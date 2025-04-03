@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Bird Species Identifier - Login</title>
+    <link rel="stylesheet" type="text/css" href="/templates/index.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="d-flex p-12 py-5 justify-content-center">
+            <?xml version="1.0" encoding="utf-8"?>
+
+            <img src="/templates/assets/bird.svg" />
+            <h1 class="px-3 primary b">Bird Species Identifier</h1>
+        </div>
+
+        <div class="section" style="width: 70%; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <div class="d-flex justify-content-center" style="flex-direction:column; gap: 15px;">
+                <div class="register-container">
+                    <h2>Register</h2>
+                    <form id="registerForm">
+                        <input type="text" id="registerName" placeholder="Name" required>
+                        <input type="text" id="registerUsername" placeholder="Username" required>
+                        <input type="password" id="registerPassword" placeholder="Password" required>
+                        <button type="submit">Register</button>
+                    </form>
+                    <p id="registerMessage"></p>
+                </div>
+                <p>Already Have an Account? <a href="./login.html">LogIn</a></p>
+            </div>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+
+<footer>
+    <div class="align-items-center justify-content-center py-1" style="text-align: center;color: gray;">Project By Group C_16</div>
+</footer>
+<script>
+    function init() {
+        // This function is called on start up
+        
+        // Add a listener to the input file to detect file upload
+        var inputFile = document.getElementById('inputFile1');
+        inputFile.addEventListener("click", onUpload, false);
+
+        // Add a listener to the input file to detect form submission
+        var submitBtn = document.getElementById('submit-btn');
+        submitBtn.addEventListener("click", onSubmit, false);
+    }
+
+    function onUpload() {
+        // When a file is uploaded, remove the disabled flag from the submit button
+        document.querySelector('#submit-btn').disabled = false;
+    }
+
+    function onSubmit(event) {
+        // When for is submitted display loading spinner until the results are ready
+        document.querySelector('.spinner-border').classList.remove('hide')
+    }
+    window.addEventListener('load', init, false);
+</script>
+
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Bird Species Identifier - Login</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+
+    <style>
+/* Login Section */
+.section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Increased gap */
+    width: 100%;
+}
+
+input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    width: 90%; /* Increased width */
+    transition: 0.3s;
+    margin: auto;
+}
+
+input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+
+/* Message */
+#loginMessage {
+    color: red;
+    font-size: 14px;
+}
+
+/* Register Link */
+p {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+p a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+    </style>
+</head>
+
+<body>
+    <div class="container mt-0">
+        <div class="d-flex p-12 py-4 justify-content-center">
+            <?xml version="1.0" encoding="utf-8"?>
+
+            <img src="{{ url_for('static', filename='assets/bird.svg') }}" />
+            <h1 class="px-3 primary bold">Bird Species Detection</h1>
+        </div>
+
+        <div class="login-section" >
+            <div class="login-block" >
+            <div class="d-flex justify-content-center" style="flex-direction:column; gap: 15px;">
+                <h2>Login</h2>
+                <form action="/login" method="post" id="loginForm" class="mt-3">
+                    <input type="email" name="email" id="loginUsername" placeholder="Email" required oninput="validateEmail()">
+                    <input type="password" name="password" id="loginPassword" placeholder="Password" required>
+                    <button id="login-now-btn" class="btn login-button primary">Login</button>
+                </form>
+                <p id="loginMessage"></p>
+                <p style="text-align: center;font-size: 16px;">Don't Have an Account? <a href="./register.html" id="showRegister">Register</a></p>
+            </div>
+        </div>
+        
+
+        <div class="register-block hidden">
+            <div class="d-flex justify-content-center" style="flex-direction:column; gap: 15px;">
+                <h2>Register</h2>
+                <form action="/register" method="post" id="registerForm" class="mt-3">
+                    <input type="text" name="name" id="Name" placeholder="Name" required>
+                    <input type="email" name="email" id="Email" placeholder="Email" required>
+                    <input type="text" name="username" id="Username" placeholder="Username" required>
+                    <input type="password" name="password" id="Password" placeholder="Password" required>
+                    <button id="login-now-btn" class="btn login-button primary">Register</button>
+                </form>
+                <p id="registerMessage" class="hidden"></p>
+                <p style="text-align: center;font-size: 16px;">Already Have an Account? <a href="./register.html" id="showLogin">LogIn</a></p>
+            </div>
+        </div>
+
+
+        <div class="img-block">
+            <img src="/static/assets/imgbg2.jpg" alt="img" class="login-img" style="height: 600px;">
+        </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="align-items-center justify-content-center py-1" style="text-align: center;color: gray;">Project By Group C_16</div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+
+
+
+
+<script>
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const authSection = document.querySelector(".login-section");
+    const loginBlock = document.querySelector(".login-block");
+    const registerBlock = document.querySelector(".register-block");
+    const showRegister = document.getElementById("showRegister");
+    const showLogin = document.getElementById("showLogin");
+
+    showRegister.addEventListener("click", function (e) {
+        e.preventDefault();
+        loginBlock.classList.add("hidden");
+        registerBlock.classList.remove("hidden");
+        authSection.classList.add("animate");
+            authSection.classList.remove("reverse")
+    });
+
+    showLogin.addEventListener("click", function (e) {
+        e.preventDefault();
+        
+        authSection.classList.remove("animate");
+        authSection.classList.add("reverse");
+        registerBlock.classList.add("hidden");
+            loginBlock.classList.remove("hidden");
+        
+    });
+});
+
+    
+</script>
+
+</html>

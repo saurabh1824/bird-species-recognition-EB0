@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Bird Species Identifier</title>
+
+    <!-- link with the styling file index.css -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+    <style>
+        .row{
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo"> 
+            <img src="{{ url_for('static', filename='assets/bird.svg') }}" />
+            Bird Species Detection
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <nav class="nav" id="nav-menu">
+            <a href="/" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+            <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About</a>
+            <a href="{{ url_for('model') }}" class="{% if request.endpoint == 'model' %}active{% endif %}">Model</a>
+            {% if logged_in %}
+                <a href="{{ url_for('profile') }}" class="{% if request.endpoint == 'profile' %}active{% endif %}">Profile</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+            
+        </nav>
+    </header>
+
+    <!-- MAIN SECTION -->
+    
+
+
+    <!-- MODEL SECTION -->
+    <section class="rounded-1" id="contact">
+        <div style="padding: 10px;text-align: center; margin-bottom: 50px;">
+            <h1>Model</h1>
+        </div>
+
+        <div class="details px-3 col mx-auto justify-content-center" style="justify-content: center; align-items: center;margin-bottom: 100px;">
+            <div class="row justify-content-center">
+                <span class="col-12 col-md-3 mb-3 b">Model name:</span>
+                <span class="col-12 col-md-3"> EfficientNetB0</span>
+            </div>
+            <div class="row">
+                <span class="col-12 col-md-3 mb-3 b">Model architecture:</span>
+                <span class="col-12 col-md-3 ml-3">Compound scaling model with MBConv blocks, global average pooling, and a dense output layer.</span>
+            </div>
+            <div class="row">
+                <span class="col-12 col-md-3 mb-3 b">Number of classes:</span>
+                <span class="col-12 col-md-3 ml-3">5</span>
+            </div>
+            <div class="row">
+                <span class="col-12 col-md-3 mb-3 b">Uploaded images:</span>
+                <span class="col-12 col-md-3 ml-3">6000{{ images }}</span>
+            </div>
+            <div class="row">
+                <span class="col-12 col-md-3 mb-3 b">Efficiency :</span>
+                <span class="col-12 col-md-3 ml-3">83.5 &#37;</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER SECTION -->
+<footer class="footer">
+    <p>Project By <strong>Group C_16</strong></p>
+    <p>&copy; 2025 All Rights Reserved</p>
+</footer>
+
+</body>
+
+<script>
+    function toggleMenu() {
+        const menu = document.getElementById("nav-menu");
+        menu.classList.toggle("active-nav");
+    }
+</script>
+
+
+
+</html>

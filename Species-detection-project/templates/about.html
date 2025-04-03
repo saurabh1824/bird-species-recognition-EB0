@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Bird Species Identifier</title>
+
+    <!-- link with the styling file index.css -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo"> 
+            <img src="{{ url_for('static', filename='assets/bird.svg') }}" />
+            Bird Species Detection
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <nav class="nav" id="nav-menu">
+            <a href="/" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+            <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About</a>
+            <a href="{{ url_for('model') }}" class="{% if request.endpoint == 'model' %}active{% endif %}">Model</a>
+            {% if logged_in %}
+                <a href="{{ url_for('profile') }}" class="{% if request.endpoint == 'profile' %}active{% endif %}">Profile</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+            
+        </nav>
+    </header>
+
+
+    <!-- CONTACT SECTION -->
+    <section class="contact" id="contact">
+        <div style="padding: 10px;">
+
+            <h2>Contact Us</h2>
+            <p>Have questions? Reach out to us:</p>
+            <p>Email: <a href="mailto:projectgroupc16@gmail.com">projectgroupc16@gmail.com</a></p>
+            <p>Phone: +91 8010430802</p>
+        </div>
+
+    </section>
+
+    <!-- FOOTER SECTION -->
+<footer class="footer">
+    <p>Project By <strong>Group C_16</strong></p>
+    <p>&copy; 2025 All Rights Reserved</p>
+</footer>
+
+</body>
+
+<script>
+    function toggleMenu() {
+        const menu = document.getElementById("nav-menu");
+        menu.classList.toggle("active-nav");
+    }
+</script>
+
+
+
+
+</html>

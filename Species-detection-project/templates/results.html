@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Bird Species Identifier - results</title>
+    <!-- link with the styling file index.css -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+
+    <style>
+        .image-section{
+            width: 40%;
+            margin: auto;
+            align-items: center;
+        }
+        .res-image{
+            /* width: 50%; */
+            max-height: 500px;
+            min-width: 450px;
+            border-radius: 30px;
+        }
+        .result-section{
+            width: 60%;
+        }
+
+        .res-top-section{
+            display: flex;
+            /* display: block; */
+            padding: 30px 0;
+        }
+
+        @media (max-width: 1100px) {
+            .res-top-section{
+                display: block;
+            }
+            .result-section{
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='assets/bird.svg') }}" />
+            Bird Species Detection
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <nav class="nav" id="nav-menu">
+            <a href="/">Home</a>
+            <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About</a>
+            <a href="{{ url_for('model') }}" class="{% if request.endpoint == 'model' %}active{% endif %}">Model</a>
+            <a href="{{ url_for('profile') }}"
+                class="{% if request.endpoint == 'profile' %}active{% endif %}">Profile</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+
+        </nav>
+    </header>
+
+
+    <!-- <div class="p-12 text-align justify-content-center">
+        <h2>Result</h2>
+    </div> -->
+
+
+    <div class="container px-5 pt-3 pb-5">
+
+
+        <div class="result-col col px-5 mx-5 justify-content-center">
+
+            <div class="res-top-section">
+                <!-- IMAGE SECTION -->
+                <div class="image-section row justify-content-center">
+                    <!-- <img src="/static/photogalary/Common-Kingfisher_172.jpg" alt="img" class="res-image" id="inferenced"> -->
+                    <img src="data:image/png;base64, {{ original }}" class="res-image" id="original">
+                    <!-- <img src="data:image/png;base64, {{ inferenced }}" alt="img" class="res-image" id="inferenced"> -->
+                </div>
+
+                <!-- RESULT-SECTION -->
+                <div class="result-section p-4 rounded shadow mt-5">
+
+                    <div class="row justify-content-center mt-2">
+                        <span class="col-12 col-md-4 mb-3">Image ID:</span>
+                        <span class="col-12 col-md-6">#{{ meta_data.ID }}</span>
+                    </div>
+
+                    <div class="row justify-content-center mt-2">
+                        <span class="col-12 col-md-4 mb-3">Species:</span>
+                        <span class="col-12 col-md-6 b imp">{{ meta_data.class }}</span>
+                    </div>
+
+                    <div class="row justify-content-center mt-2">
+                        <span class="col-12 col-md-4 mb-3">Probability:</span>
+                        <span class="col-12 col-md-6 b imp">{{ meta_data.score }}%</span>
+                    </div>
+
+                    <div class="row justify-content-center mt-2">
+                        <span class="col-12 col-md-4 mb-3">Scientific Name :</span>
+                        <span class="col-12 col-md-6 b imp">{{ meta_data.scientific_name }}</span>
+                    </div>
+
+                    <div class="row justify-content-center mt-2">
+                        <span class="col-12 col-md-4 mb-3">Discription:</span>
+                        <span class="col-12 col-md-6 b" style="text-align: left !important;">{{ meta_data.description }}</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- PHOTO GALARY SECTION -->
+            <div style="text-align: center;font-size: 50px; font-weight: bold;padding: 10px 20px;margin-top: 20px; margin-bottom: 20px; ">Photo Galary</div>
+            {% if meta_data.scientific_name!="Unknown" %}
+                {% include "components/photo-galary/"+meta_data.class+".html" %}
+            {% else %}
+                <div style="display: flex; font-size: 30px; font-weight: bold; color: gray; opacity: 50%;text-align: center; justify-content: center;align-items: center; min-height: 400px;" >No Photos Available</div>
+            {% endif %}
+            
+            <!-- MORE RESULT SECTION -->
+            <!-- <div style="text-align: center;font-size: 50px; font-weight: bold;padding: 10px 20px;margin-top: 20px; ">More Results</div>
+            <div class="shadow" style="min-height: 500px;align-items: center; padding:20px; display: flex; gap: 10px;max-width: 100%;margin:auto; height: auto;flex-wrap: wrap;justify-content: space-around;">
+                {% if more_result %}
+                    {% for bird in more_result %}
+                        {% include "components/species-box.html" %}
+                    {% endfor %}
+                {% else %}
+                    <div style="font-size: 30px; font-weight: bold; color: gray; opacity: 50%;" >No More Results Available for This species</div>
+                {% endif %}
+            </div> -->
+
+            <!-- RESULT-SECTION 2 -->
+            <div class="col mt-5">
+                <p class="primary"> <b>Image ID:</b>#{{ meta_data.ID }}</p>
+                
+                <!-- <p class="primary"> <b>Image name:</b> {{ meta_data.img_name }}</p> -->
+            </div>
+
+            <table class="table py-3 mb-5">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Bird Species</th>
+                        <th scope="col">Probability</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in meta_data.objects %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td class="imp">{{ item.class.name }}</td>
+                        <td class="imp">{{ item.score }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+            <!-- FEEDBACK SECTION -->
+            <!-- <div class="feedback p-4 my-3">
+                <div class="submitted title d-flex justify-content-center hide">
+                    <h1 class="b">Thank you for your feedback!</h1>
+                </div>
+
+                <div class="form">
+                    <div class="title col mb-3">
+                        <h2 class="b">Feedback</h2>
+                        <span>Help us improve! Let us know how well the model performed on your image.</span>
+                    </div>
+
+                    <p class="b">Did it accurately detect your bird?</p>
+                    <form id="form" action="/feedback" method="post">
+                        <div class="form-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" onchange="onChange" type="radio" name="vote" id="yes"
+                                    value="yes">
+                                <label class="form-check-label" for="inlineRadio1">yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" onchange="onChange" type="radio" name="vote" id="no"
+                                    value="no">
+                                <label class="form-check-label" for="inlineRadio2">no</label>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="row mx-2 d-flex justify-content-end">
+                            <button type="submit" class="col-auto btn primary" id="submit_btn"
+                                disabled="true">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div> -->
+
+            <br />
+        </div>
+    </div>
+
+
+    <!-- FOOTER SECTION -->
+    <footer class="footer">
+        <p>Project By <strong>Group C_16</strong></p>
+        <p>&copy; 2025 All Rights Reserved</p>
+    </footer>
+</body>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script>
+    function init() {
+        // This function is called on start up
+
+        // Add a listener to the form to listen to form updates
+        form = document.querySelector('form')
+        form.addEventListener('change', onChange, false);
+
+        // If user has already voted  ->  remove the form and show thank you note
+        if ('{{ is_submitted }}' === 'True') {
+            document.querySelector('.submitted').classList.remove('hide')
+            document.querySelector('.form').classList.add('hide')
+        }
+    }
+
+    function onChange(e) {
+        var data = {}; // Form values
+        var formData = new FormData(form);
+        for (var key of formData.keys()) {
+            data[key] = formData.get(key);
+        }
+
+        // if (data.vote === 'no') {
+        //     // If the user voted that the model did not detect all birds in picture
+        //     // Show the survey
+
+        //     survey = document.querySelector('.survey')
+
+        //     if (survey.classList.contains('hide'))
+        //         survey.classList.remove('hide')
+
+        //     if (!!(data.ground_truth && data.predicted))
+        //         document.querySelector('#submit_btn').disabled = false;
+        //     else
+        //         document.querySelector('#submit_btn').disabled = true; // disabled until form is filled
+        // }
+
+        if (data.vote === 'yes' || data.vote === 'no') {
+            // If the user is satisfied with the results
+            // enable submission without further questions
+            document.querySelector('#submit_btn').disabled = false;
+            survey = document.querySelector('.survey')
+
+            if (!survey.classList.contains('hide')) // hide survey questions
+                survey.classList.add('hide')
+        }
+    }
+
+    /*
+    function onSubmit(e) {
+        // submit form data
+        e.preventDefault();
+
+        var data = {};
+        var formData = new FormData(form);
+        for (var key of formData.keys()) {
+            data[key] = formData.get(key);
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/uploads/{{ meta_data.ID }}',
+            data: data,
+            success: function () {
+                // hide form and show thank you note
+                document.querySelector('.submitted').classList.remove('hide')
+                document.querySelector('.form').classList.add('hide')
+            }
+        })
+    }*/
+
+    window.addEventListener('load', init, false);
+    window.addEventListener('submit', onSubmit, false);
+
+
+    function toggleMenu() {
+        const menu = document.getElementById("nav-menu");
+        menu.classList.toggle("active-nav");
+    }
+</script>
+
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/bird.svg') }}">
+    <title>Profile</title>
+
+    <!-- link with the styling file index.css -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+
+    <style>
+        .profile-container {
+            width: 80%;
+            min-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            justify-content:left;
+            gap: 60px;
+            margin-bottom: 20px;
+            padding: 50px;
+        }
+        .profile-header img {
+            width: 180px;
+            height: 200px;
+            border-radius: 10px; /* Slight rounded corners */
+            object-fit: cover;
+            border: 1px solid black;
+        }
+        .user-details {
+            display: grid;
+            grid-template-columns: 100px auto;
+            row-gap: 8px;
+        }
+        .user-details p {
+            margin: 0;
+            font-size: 19px;
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+        .user-details img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .user-history{
+            width: 80%;
+            padding: 50px;
+            margin: auto;
+            background-color: rgb(247, 247, 247);
+            border-radius: 5px;
+        }
+
+        .history-title{
+            font-weight: bold;
+            padding: 0 50px;
+            margin-bottom: 30px;
+        }
+        .history-list{
+            max-height: 350px;
+            overflow: scroll;
+        }
+        .entry-a{
+            width: 90%;
+            display: inline-flex;
+        }
+        .history-entry {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            border: 1px solid black;
+            padding: 3px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .history-entry:hover{
+            background-color: beige;
+            transition: 0.5s;
+        }
+        .history-entry p {
+            margin: 10px 0px; /* Adds space between Name and ID */
+        }
+        .no-history {
+            color: grey;
+            font-style: italic;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 1000px) {
+
+    .profile-header {
+        flex-direction: column; /* Stack image and details */
+        align-items: center; /* Center align content */
+        gap: 20px;
+    }
+    .user-details {
+            grid-template-columns: 60px auto;
+        }
+
+    .user-history{
+        width: 100%;
+    }
+    .user-details p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+    .history-entry {
+        padding: 3px 15px;
+        font-size: 14px;
+    }
+}
+
+
+    .del-button{
+        border: none;
+        padding: 0;
+        border-radius: 50%;
+        cursor: pointer;
+        height: fit-content;
+    }
+
+    .delete-warning{
+        padding: 20px 40px;
+        border: 1px solid black;
+        font-size: 20px;
+        width: 400px;
+        border-radius: 20px;
+        background-color: rgba(155, 153, 153, 0.591);
+        font-weight: bold;
+        display: none;
+    }
+    .delete-warning button{
+        padding: 5px 15px;
+        border: 2px solid black;
+        border-radius: 40px;
+    }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo"> 
+            <img src="{{ url_for('static', filename='assets/bird.svg') }}" />
+            Bird Species Detection
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <nav class="nav" id="nav-menu">
+            <a href="/" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+            <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About</a>
+            <a href="{{ url_for('model') }}" class="{% if request.endpoint == 'model' %}active{% endif %}">Model</a>
+            {% if session.logged_in %}
+                <a href="{{ url_for('profile') }}" class="{% if request.endpoint == 'profile' %}active{% endif %}">Profile</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+            
+        </nav>
+    </header>
+
+    <!-- MAIN SECTION -->
+    <!-- <div class="container">
+
+        <div class="">
+            <div class="user-details"></div>
+            <div class="user-history">
+
+                <h2>History</h2>
+                <div class="history d-flex flex-row">
+                    <div class="history-entry"></div>
+                </div>
+            </div>
+        </div>
+
+    </div> -->
+
+
+    <div class="container">
+        <div class="profile-container">
+            <div class="profile-header">
+                <img src="{{ url_for('static', filename='assets/profile-img.jpg') }}" alt="User Avatar">
+                <div class="user-details">
+                    <div class="name" style="font-size: 50px; font-size: bold;">{{ session.details.username }}</div>
+                    <div></div>
+
+                    <p class="label">Name:</p>
+                    <p id="user-name">{{ session.details.name }}</p>
+                    
+                    <p class="label">Email:</p>
+                    <p id="user-email">{{ session.details.email }}</p>
+                    
+                </div>
+            </div>
+
+            <!-- User History -->
+            <div class="user-history">
+                <h3 class="history-title">History</h3>
+                <div class="history-list">
+                    {% if session.history %}
+                        {% for entry in session.history %}
+                        <div style="display: flex; gap: 5px; align-items: center;" >
+                            <a class="entry-a" href="{{ url_for('results', ID=entry.image_id) }}" target="_blank" style="color: black;text-decoration: none;">
+                                <div id="history-entry" class="history-entry">
+                                    <p><strong>{{ entry.name }}</strong></p>
+                                    <p>ID: {{ entry.image_id }}</p>
+                                    <div style="position: absolute; right: 35px;">
+                                        <p style="color: gray;" >{{ entry.time }}</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="{{ url_for('delete', ID=entry.image_id) }}">
+
+                                <button class="del-button">
+                                    <img src="{{ url_for('static', filename='assets/delete_icon.png')}}" alt="del" style="width:40px;height: auto;">
+                                </button>
+                            </a>
+                        </div>
+                        <!-- delete warning -->
+                        <div class="delete-warning" id="del-{{ entry.image_id }}">
+                            <div style="margin-bottom : 35px; padding-left: 30px;">Want to Delete Entry ?</div>
+                            <div style="display: flex; gap: 15px; justify-content: right;">
+                                <button>Cancle</button>
+                                <button style="background-color: red;">Delete</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-history">No history available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+    <!-- FOOTER SECTION -->
+    <footer class="footer">
+        <p>Project By <strong>Group C_16</strong></p>
+        <p>&copy; 2025 All Rights Reserved</p>
+    </footer>
+
+</body>
+
+
+
+
+
+<script>
+
+    // toggle menu in responsive small screen
+    function toggleMenu() {
+        const menu = document.getElementById("nav-menu");
+        menu.classList.toggle("active-nav");
+    }
+    function show_delete_warning(){
+        const del = document.getElementById("delete-warning");
+        del.style.display = "block";
+    }
+    function cancle_delete(){
+        const del = document.getElementById("delete-warning");
+        del.style.display = "none";
+    }
+</script>
+
+</html>

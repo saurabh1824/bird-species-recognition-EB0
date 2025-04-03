@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Bird Species Identifier</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/bird.svg') }}">
+
+    <!-- link with the styling file index.css -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+    <style>
+        .success{color: green;}
+        .flash-msg{
+            padding: 10px;
+            margin: 10px;
+            position: absolute;
+            top: 2%;
+            left: 45%;
+            font-weight: bold;
+            border-radius: 5px;
+            width: fit-content;
+        }
+
+        /* Full-screen overlay for loader */
+        .loadingscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            visibility: hidden; /* Initially hidden */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+
+        .loadingscreen img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Rotating Loader */
+        .loader {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 4px solid transparent;
+            border-top: 5px solid black;
+            border-right: 5px solid black;
+            border-radius: 50%;
+            animation: rotate 1s linear infinite;
+        }
+        /* Rotation Animation */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+
+        /* upload styling */
+        .upload-container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .upload-icon {
+            height: 64px;
+            width: 64px;
+            margin: 0 auto 16px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .upload-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #555;
+        }
+        .upload-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .upload-subtext {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .file-input1 {
+            display: none;
+        }
+        .upload-note {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="{{ category }} flash-msg">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="logo">
+            <img src="{{ url_for('static', filename='assets/bird.svg') }}" />
+            Bird Species Detection
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <nav class="nav" id="nav-menu">
+            <a href="/" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+            <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About</a>
+            <a href="{{ url_for('model') }}" class="{% if request.endpoint == 'model' %}active{% endif %}">Model</a>
+            {% if logged_in %}
+            <a href="{{ url_for('profile') }}"
+                class="{% if request.endpoint == 'profile' %}active{% endif %}">Profile</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+
+        </nav>
+    </header>
+
+    <!-- MAIN SECTION -->
+    <div class="container">
+        <!-- <div class="d-flex p-12 py-5 justify-content-center">
+            <?xml version="1.0" encoding="utf-8"?>
+
+            <img src="{{ url_for('static', filename='assets/bird.svg') }}" />
+            <h1 class="px-3 primary b">Bird Species Identifier</h1>
+        </div> -->
+
+        <div class="section">
+            <div class="row justify-content-between mb-5">
+                <div class="col-6 py-4">
+                    <h2 class="bold">Welcome {{ session.user }}! <br> Curious about that bird you saw?</h2>
+                    <h3>
+                        upload your image now and know which bird it was!
+                    </h3>
+                </div>
+
+                <div class="col-6 d-flex py-1 px-5 justify-content-end">
+                    <div class="flock_of_birds">
+                        <!-- <img src="{{ url_for('static', filename='assets/flock-of-birds.svg') }}" /> -->
+                    </div>
+                </div>
+            </div>
+
+            <hr style="width: 40%;">
+            </hr>
+            <div class="mt-5">
+                {% if logged_in %}
+                <!-- <form action="upload.html">  add this to upload data  method="post" enctype="multipart/form-data">  -->
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <div class="upload-section row d-flex justify-content-between">
+                        <div class="col-6 pr-1 mb-3">
+                            <label for="inputFile1" class="form-label">Upload your image</label>
+                            <input name="file" class="form-control file-input" type="file" id="inputFile1">
+                        </div>
+                        <div class="col-6 mb-3  d-flex flex-row align-items-end">
+                            <button disabled type="submit" id="submit-btn" class="btn primary" onclick="showLoader()" >Upload</button>
+                            <!-- <div class="spinner-border hide mx-3" role="status"></div> -->
+                        </div>
+                        <div class="note-container d-flex" style="color: #ff9800de; gap: 5px; font-size: 14px;">
+                            <div class="note-title" style="font-weight: bold;margin-left: 10px;">Note:</div>
+                            <div class="note-details">
+                                Only JPG, PNG, and JPEG files are allowed. <br>
+                                Maximum file size: 16MB.
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                <div>
+                    <button id="start-now-btn" class="btn primary">Start Now</button>
+                </div>
+
+                {% endif %}
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <!-- Upload image section 2 -->
+    <!-- <form class="upload-container">
+        <div class="upload-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 19V5M5 12l7-7 7 7M19 16v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2"></path>
+            </svg>
+        </div>
+        <h3 class="upload-text">Upload bird image</h3>
+        <p class="upload-subtext">Drag and drop an image of a bird, or click to select a file for species identification.</p>
+
+    
+        <div class="btn-container">
+            <label class="btn btn-primary">
+                Choose Image
+                <input type="file" class="file-input" accept="image/*" id="fileInput">
+            </label>
+            <button type="button" class="btn btn-secondary" onclick="openCamera()">Use Camera</button>
+        </div>
+
+        <p class="upload-note">Supported formats: JPG, PNG, WEBP (max 10MB)</p>
+    </form> -->
+    
+    
+    <!-- LOADER -->
+    <div class="loadingscreen" id="loadingscreen">
+        <div class="loader"></div>
+        <img src="/static/assets/bird.svg" alt="Bird">
+    </div>
+    
+
+
+    <!-- FOOTER SECTION -->
+    <footer class="footer">
+        <p>Project By <strong>Group C_16</strong></p>
+        <p>&copy; 2025 All Rights Reserved</p>
+    </footer>
+
+</body>
+
+<!-- <footer id="footer" >
+    <div class="align-items-center justify-content-center py-1" style="text-align: center;color: gray;">Project By Group C_16</div>
+</footer> -->
+
+
+
+
+<script>
+    // loader script
+    function showLoader() {
+        let loader = document.getElementById('loadingscreen');
+        loader.style.visibility = "visible";
+        loader.style.opacity = "1";
+    }
+
+ 
+
+    function init() {
+        //listener to the input file to detect file upload
+        var inputFile = document.getElementById('inputFile1');
+        inputFile.addEventListener("change", onUpload, false);
+
+        //listener to the input file to detect form submission
+        var submitBtn = document.getElementById('submit-btn');
+        submitBtn.addEventListener("click", onSubmit, false);
+    }
+
+    function onUpload() {
+        // after file is uploaded, remove the disabled flag from the submit button
+        document.querySelector('#submit-btn').disabled = false;
+    }
+
+    function onSubmit(event) {
+        // When for is submitted display loading spinner until the results are ready
+        document.querySelector('.spinner-border').classList.remove('hide')
+    }
+    window.addEventListener('load', init, false);
+
+
+
+
+
+    // startButton logic
+    function handleStartNowClick() {
+        window.location.href = "/login";
+    }
+    // Add event listener when the page loads
+    document.addEventListener("DOMContentLoaded", function () {
+        const startButton = document.getElementById("start-now-btn");
+
+        // Check if button exists to avoid errors
+        if (startButton) {
+            startButton.addEventListener("click", handleStartNowClick);
+        }
+    })
+
+
+    // toggle menu in responsive small screen
+    function toggleMenu() {
+        const menu = document.getElementById("nav-menu");
+        menu.classList.toggle("active-nav");
+    }
+
+    // Automatically remove flash messages after few seconds
+    setTimeout(function() {
+            let messages = document.querySelectorAll(".flash-msg");
+            messages.forEach(function(message) {
+                message.style.display = "none";
+            });
+        }, 1500);
+
+</script>
+
+</html>
