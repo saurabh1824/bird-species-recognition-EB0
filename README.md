@@ -1,4 +1,3 @@
-# bird-species-recognition-EB0
 
 # Bird Species Recognition using Deep Learning
 
